@@ -6,17 +6,26 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from './guard/auth.guard';
+import { Roles } from './decorator/roles.decorator';
+import { UserRole } from './enums/user-role.enum';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  @Roles([UserRole.ADMIN])
+  @UseGuards(AuthGuard)
+  create(@Body() createUserDto: CreateUserDto, @Req() req) {
+    console.log('req', req);
+
     return this.userService.create(createUserDto);
   }
 
