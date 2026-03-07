@@ -1,56 +1,43 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { UserRole } from './enums/user-role.enum';
+import { Gender } from './enums/gender.enum';
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({
-    required: true,
-    type: String,
-    min: [3, 'Name must be at least 3 characters long'],
-    max: [30, 'Name must be at most 30 characters long'],
-  })
+  @Prop({ required: true, type: String, minlength: 3, maxLength: 30 })
   name: string;
 
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({
-    required: true,
-    min: [8, 'Password must be at least 8 characters long'],
-    max: [20, 'Password must be at most 20 characters long'],
-  })
+  @Prop({ required: true, type: String, minLength: 8, maxLength: 20 })
   password: string;
 
-  @Prop({
-    required: true,
-    type: String,
-    enum: ['user', 'admin'],
-    default: 'user',
-  })
-  role: string;
+  @Prop({ type: String, enum: UserRole, default: UserRole.USER })
+  role: UserRole;
 
-  @Prop({ type: String })
+  @Prop({ type: String, required: false })
   avatar?: string;
 
-  @Prop({ type: Number, min: 18, max: 100 })
-  age: number;
+  @Prop({ type: Number, min: 18, max: 100, required: false })
+  age?: number;
 
-  @Prop({ type: String })
-  phoneNumber: string;
+  @Prop({ type: String, required: false })
+  phoneNumber?: string;
 
-  @Prop({ type: String })
-  address: string;
+  @Prop({ type: String, required: false })
+  address?: string;
 
-  @Prop({ type: Boolean, enum: [true, false] })
+  @Prop({ type: Boolean, default: true })
   active: boolean;
 
-  @Prop({ type: String })
-  verificationCode: string;
+  @Prop({ type: String, required: false })
+  verificationCode?: string;
 
-  @Prop({ type: String, enum: ['male', 'female'] })
-  gender: string;
+  @Prop({ type: String, enum: Gender, required: false })
+  gender?: Gender;
 }
-
 export const UserSchema = SchemaFactory.createForClass(User);
