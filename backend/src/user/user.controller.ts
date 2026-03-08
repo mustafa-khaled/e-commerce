@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -20,12 +19,13 @@ import { UserRole } from './enums/user-role.enum';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  // @docs   Admin can create User
+  // @Route  POST /api/v1/user
+  // @access Private [admin]
   @Post()
   @Roles([UserRole.ADMIN])
   @UseGuards(AuthGuard)
-  create(@Body() createUserDto: CreateUserDto, @Req() req) {
-    console.log('req', req);
-
+  create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 

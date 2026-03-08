@@ -13,7 +13,7 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: true, type: String, minLength: 8, maxLength: 20 })
+  @Prop({ required: true, type: String, minLength: 8, select: false })
   password: string;
 
   @Prop({ type: String, enum: UserRole, default: UserRole.USER })
@@ -31,7 +31,7 @@ export class User {
   @Prop({ type: String, required: false })
   address?: string;
 
-  @Prop({ type: Boolean, default: true })
+  @Prop({ type: Boolean, default: true, select: false })
   active: boolean;
 
   @Prop({ type: String, required: false })

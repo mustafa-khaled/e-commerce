@@ -27,8 +27,9 @@ export class CreateUserDto {
   @Length(8, 20, { message: 'Password must be 8-20 characters long' })
   password: string;
 
+  @IsOptional()
   @IsEnum(UserRole)
-  role: UserRole;
+  role?: UserRole;
 
   @IsOptional()
   @IsUrl()
