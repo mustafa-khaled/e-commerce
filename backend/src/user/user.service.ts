@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { QueryUserDto } from './dto/query-user.dto';
 
 const saltOrRounds = 10;
 
@@ -36,11 +37,47 @@ export class UserService {
     };
   }
 
-  async findAll() {
+  async findAll(query: QueryUserDto) {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      name,
+      email,
+      role,
+    } = query;
+
+    const skip = (page - 1) * limit;
+
+    const filter: any = {};
+
+    if (name) filter.name = { $regex: name, $options: 'i' };
+    if (email) filter.email = { $regex: email, $options: 'i' };
+    if (role) filter.role = role;
+
+    const [users, total] = await Promise.all([
+      this.userModel
+        .find(filter)
+        .skip(skip)
+        .limit(limit)
+        .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })
+        .exec(),
+
+      this.userModel.countDocuments(filter),
+    ]);
+
     return {
       status: 200,
       message: 'Users fetched successfully',
-      data: await this.userModel.find(),
+      data: users,
+
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
     };
   }
 

@@ -7,13 +7,15 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthGuard } from './guard/auth.guard';
-import { Roles } from './decorator/roles.decorator';
-import { UserRole } from './enums/user-role.enum';
+import { AuthGuard } from '@/user/guard/auth.guard';
+import { Roles } from '@/user/decorator/roles.decorator';
+import { UserRole } from '@/user/enums/user-role.enum';
+import { QueryUserDto } from '@/user/dto/query-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -39,8 +41,8 @@ export class UserController {
   @Get()
   @Roles([UserRole.ADMIN])
   @UseGuards(AuthGuard)
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Query() query: QueryUserDto) {
+    return this.userService.findAll(query);
   }
 
   /**
