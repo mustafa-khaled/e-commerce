@@ -1,10 +1,10 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { Model, isValidObjectId } from 'mongoose';
+import * as bcrypt from 'bcrypt';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from './user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User } from './user.schema';
-import * as bcrypt from 'bcrypt';
 
 const saltOrRounds = 10;
 
@@ -29,26 +29,64 @@ export class UserService {
     return {
       status: 200,
       message: 'User created successfully',
-      data: this.userModel.create({
+      data: await this.userModel.create({
         ...createUserDto,
         password: hashedPassword,
       }),
     };
   }
 
-  findAll() {
-    return this.userModel.find();
+  async findAll() {
+    return {
+      status: 200,
+      message: 'Users fetched successfully',
+      data: await this.userModel.find(),
+    };
   }
 
-  findOne(id: string) {
-    return this.userModel.findById(id);
+  private async findUser(id: string) {
+    if (!isValidObjectId(id)) throw new NotFoundException('User not found');
+    const user = await this.userModel.findById(id);
+    if (!user) throw new NotFoundException('User not found');
+    return user;
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true });
+  async findOne(id: string) {
+    const user = await this.findUser(id);
+
+    return {
+      status: 200,
+      message: 'User fetched successfully',
+      data: user,
+    };
   }
 
-  remove(id: string) {
-    return this.userModel.findByIdAndDelete(id);
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    await this.findUser(id);
+
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(
+        updateUserDto.password,
+        saltOrRounds,
+      );
+    }
+
+    return {
+      status: 200,
+      message: 'User updated successfully',
+      data: await this.userModel.findByIdAndUpdate(id, updateUserDto, {
+        returnDocument: 'after',
+      }),
+    };
+  }
+
+  async remove(id: string) {
+    await this.findUser(id);
+    await this.userModel.findByIdAndDelete(id);
+
+    return {
+      status: 200,
+      message: 'User deleted successfully',
+    };
   }
 }

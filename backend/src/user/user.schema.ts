@@ -39,5 +39,8 @@ export class User {
 
   @Prop({ type: String, enum: Gender, required: false })
   gender?: Gender;
+
+  @Prop({ select: false })
+  __v: number;
 }
 export const UserSchema = SchemaFactory.createForClass(User);

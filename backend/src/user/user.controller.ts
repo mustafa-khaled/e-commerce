@@ -15,13 +15,15 @@ import { AuthGuard } from './guard/auth.guard';
 import { Roles } from './decorator/roles.decorator';
 import { UserRole } from './enums/user-role.enum';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // @docs   Admin can create User
-  // @Route  POST /api/v1/user
-  // @access Private [admin]
+  /**
+   * @desc    Create a new user
+   * @route   POST /api/v1/users
+   * @access  Private (Admin)
+   */
   @Post()
   @Roles([UserRole.ADMIN])
   @UseGuards(AuthGuard)
@@ -29,22 +31,48 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  /**
+   * @desc    Get all users
+   * @route   GET /api/v1/users
+   * @access  Private (Admin)
+   */
   @Get()
+  @Roles([UserRole.ADMIN])
+  @UseGuards(AuthGuard)
   findAll() {
     return this.userService.findAll();
   }
 
+  /**
+   * @desc    Get user by ID
+   * @route   GET /api/v1/users/:id
+   * @access  Private (Admin)
+   */
   @Get(':id')
+  @Roles([UserRole.ADMIN])
+  @UseGuards(AuthGuard)
   findOne(@Param('id') id: string) {
     return this.userService.findOne(id);
   }
 
+  /**
+   * @desc    Update user
+   * @route   PATCH /api/v1/users/:id
+   * @access  Private (Admin)
+   */
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }
 
+  /**
+   * @desc    Delete user
+   * @route   DELETE /api/v1/users/:id
+   * @access  Private (Admin)
+   */
   @Delete(':id')
+  @Roles([UserRole.ADMIN])
+  @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
   }
