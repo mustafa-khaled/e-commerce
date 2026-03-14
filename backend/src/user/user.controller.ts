@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -77,5 +78,42 @@ export class UserController {
   @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
+  }
+}
+
+@Controller('user/me')
+export class UserMeController {
+  constructor(private readonly userService: UserService) {}
+
+  // For User
+  /**
+   * @desc    Get current user
+   * @route   GET /api/v1/users/me
+   * @access  Private (User, Admin)
+   */
+  @Get()
+  @UseGuards(AuthGuard)
+  @Roles([UserRole.ADMIN, UserRole.USER])
+  getMe(@Req() req) {
+    return this.userService.getMe(req.user._id);
+  }
+
+  /**
+   * @desc    Update current user
+   * @route   PATCH /api/v1/users/me
+   * @access  Private (User, Admin)
+   */
+  @Patch()
+  @UseGuards(AuthGuard)
+  @Roles([UserRole.ADMIN, UserRole.USER])
+  updateMe(@Req() req, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.updateMe(req.user._id, updateUserDto);
+  }
+
+  @Delete()
+  @UseGuards(AuthGuard)
+  @Roles([UserRole.USER])
+  deleteMe(@Req() req) {
+    return this.userService.deleteMe(req.user._id);
   }
 }

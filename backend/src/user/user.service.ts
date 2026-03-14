@@ -22,11 +22,7 @@ export class UserService {
     });
     if (isExist) throw new HttpException('User already exists', 400);
 
-    const hashedPassword = await bcrypt.hash(
-      createUserDto.password,
-      saltOrRounds,
-    );
-
+    const hashedPassword = await this.hashPassword(createUserDto.password);
     return {
       status: 200,
       message: 'User created successfully',
@@ -81,13 +77,6 @@ export class UserService {
     };
   }
 
-  private async findUser(id: string) {
-    if (!isValidObjectId(id)) throw new NotFoundException('User not found');
-    const user = await this.userModel.findById(id);
-    if (!user) throw new NotFoundException('User not found');
-    return user;
-  }
-
   async findOne(id: string) {
     const user = await this.findUser(id);
 
@@ -102,10 +91,7 @@ export class UserService {
     await this.findUser(id);
 
     if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(
-        updateUserDto.password,
-        saltOrRounds,
-      );
+      updateUserDto.password = await this.hashPassword(updateUserDto.password);
     }
 
     return {
@@ -120,6 +106,59 @@ export class UserService {
   async remove(id: string) {
     await this.findUser(id);
     await this.userModel.findByIdAndDelete(id);
+
+    return {
+      status: 200,
+      message: 'User deleted successfully',
+    };
+  }
+
+  private async findUser(id: string) {
+    if (!isValidObjectId(id)) throw new NotFoundException('User not found');
+    const user = await this.userModel.findById(id);
+    if (!user) throw new NotFoundException('User not found');
+    return user;
+  }
+
+  private async hashPassword(password: string) {
+    return await bcrypt.hash(password, saltOrRounds);
+  }
+
+  // ===================== For user =====================
+
+  async getMe(id: string) {
+    const user = await this.findUser(id);
+
+    return {
+      status: 200,
+      message: 'User fetched successfully',
+      data: user,
+    };
+  }
+
+  async updateMe(id: string, updateUserDto: UpdateUserDto) {
+    await this.findUser(id);
+
+    if (updateUserDto.password) {
+      updateUserDto.password = await this.hashPassword(updateUserDto.password);
+    }
+
+    return {
+      status: 200,
+      message: 'User updated successfully',
+      data: await this.userModel.findByIdAndUpdate(id, updateUserDto, {
+        new: true,
+      }),
+    };
+  }
+
+  async deleteMe(id: string) {
+    await this.findUser(id);
+    await this.userModel.findByIdAndUpdate(
+      id,
+      { active: false },
+      { new: true },
+    );
 
     return {
       status: 200,
