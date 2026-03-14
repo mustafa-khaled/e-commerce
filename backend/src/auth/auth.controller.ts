@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import {
   SigninDto,
   SignupDto,
+  VerifyEmailAndCode,
   VerifyEmailDto,
 } from './dtos/auth.dto';
 
@@ -42,22 +43,22 @@ export class AuthController {
 
   /**
    * @desc    Verify user email
-   * @route   POST /api/v1/auth/verify-email
+   * @route   POST /api/v1/auth/verify-code
    * @access  Public
    */
 
-  @Post('verify-email')
-  verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-    return this.authService.verifyEmail(verifyEmailDto);
+  @Post('verify-code')
+  verifyCode(@Body() verifyCodeDto: VerifyEmailAndCode) {
+    return this.authService.verifyCode(verifyCodeDto);
   }
 
   /**
-   * @desc    Resend verification email
-   * @route   POST /api/v1/auth/resend-verification-email
-   * @access  Public
+   * @desc    Change user password
+   * @route   POST /api/v1/auth/change-password
+   * @access  Public 
    */
-  @Post('resend-verification-email')
-  resendVerificationEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-    return this.authService.resendVerificationEmail(verifyEmailDto);
+  @Post('change-password')
+  changePassword(@Body() changePasswordDto: SigninDto) {
+    return this.authService.changePassword(changePasswordDto);
   }
 }

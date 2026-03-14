@@ -1,4 +1,5 @@
 import { PickType } from '@nestjs/mapped-types';
+import { execFileSync } from 'child_process';
 import { IsEmail, IsString, Length } from 'class-validator';
 
 export class SignupDto {
@@ -19,5 +20,11 @@ export class SigninDto extends PickType(SignupDto, [
   'password',
 ] as const) {}
 
-
 export class VerifyEmailDto extends PickType(SignupDto, ['email'] as const) {}
+
+export class VerifyEmailAndCode extends PickType(SignupDto, [
+  'email',
+] as const) {
+  @IsString()
+  code: string;
+}

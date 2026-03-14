@@ -4,7 +4,12 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SigninDto, SignupDto, VerifyEmailDto } from './dtos/auth.dto';
+import {
+  SigninDto,
+  SignupDto,
+  VerifyEmailAndCode,
+  VerifyEmailDto,
+} from './dtos/auth.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/user/user.schema';
@@ -93,9 +98,34 @@ export class AuthService {
     };
   }
 
-  async verifyEmail(verifyEmailDto: VerifyEmailDto) {}
+  async verifyCode({ code, email }: VerifyEmailAndCode) {
+    const user = await this.userModel.findOne({ email });
+    if (!user) throw new NotFoundException('User not found');
 
-  async resendVerificationEmail(verifyEmailDto: VerifyEmailDto) {}
+    if (user.verificationCode !== code)
+      throw new UnauthorizedException('Invalid code');
+
+    user.verificationCode = undefined as any;
+    user.save();
+
+    return {
+      status: 200,
+      message: 'User verified successfully',
+    };
+  }
+
+  async changePassword({ email, password }: SigninDto) {
+    const user = await this.userModel.findOne({ email });
+    if (!user) throw new NotFoundException('User not found');
+
+    user.password = await this.hashPassword(password);
+    user.save();
+
+    return {
+      status: 200,
+      message: 'User password changed successfully',
+    };
+  }
 
   private async hashPassword(password: string) {
     return await bcrypt.hash(password, saltOrRounds);
