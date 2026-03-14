@@ -18,3 +18,6 @@ export class SigninDto extends PickType(SignupDto, [
   'email',
   'password',
 ] as const) {}
+
+
+export class VerifyEmailDto extends PickType(SignupDto, ['email'] as const) {}

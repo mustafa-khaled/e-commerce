@@ -4,12 +4,13 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SigninDto, SignupDto } from './dtos/auth.dto';
+import { SigninDto, SignupDto, VerifyEmailDto } from './dtos/auth.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/user/user.schema';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { MailerService } from '@nestjs-modules/mailer';
 
 const saltOrRounds = 10;
 
@@ -18,6 +19,7 @@ export class AuthService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private jwtService: JwtService,
+    private readonly mailService: MailerService,
   ) {}
   async register(registerDto: SignupDto) {
     const isExist = await this.userModel.findOne({
@@ -67,6 +69,34 @@ export class AuthService {
     };
   }
 
+  async resetPassword({ email }: VerifyEmailDto) {
+    const user = await this.userModel.findOne({ email });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    // Generate 6 digit code
+    const code = Math.floor(100000 + Math.random() * 900000);
+
+    // Save code to user
+    await this.userModel.findOneAndUpdate(
+      { email },
+      {
+        verificationCode: code,
+      },
+    );
+    // Send code to user email
+    this.sendMail(code, email);
+
+    return {
+      status: 200,
+      message: 'Verification code sent to your email successfully',
+    };
+  }
+
+  async verifyEmail(verifyEmailDto: VerifyEmailDto) {}
+
+  async resendVerificationEmail(verifyEmailDto: VerifyEmailDto) {}
+
   private async hashPassword(password: string) {
     return await bcrypt.hash(password, saltOrRounds);
   }
@@ -74,6 +104,24 @@ export class AuthService {
   private async generateToken(payload: any) {
     return await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_SECRET,
+    });
+  }
+
+  private sendMail(code: number, email: string) {
+    const htmlMessage = `
+    <div>
+      <h1>Forgot your password?</h1>
+      <p>If you didn't forget your password, please ignore this email!</p>
+      <p>Your verification code is: <h3 style="color: red; font-weight: bold">${code}</h3></p>
+      <h6 style="font-weight: bold">E-commerce</h6>
+    </div>
+    `;
+
+    this.mailService.sendMail({
+      from: `E-commerce <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: `E-commerce - Reset password`,
+      html: htmlMessage,
     });
   }
 }
