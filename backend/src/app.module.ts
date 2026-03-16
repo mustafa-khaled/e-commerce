@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { MailerModule } from '@nestjs-modules/mailer';
 import { MongooseModule } from '@nestjs/mongoose';
+import configuration from './config/configuration';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
-import configuration from './config/configuration';
-import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './auth/auth.module';
-import { MailerModule } from '@nestjs-modules/mailer';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -30,6 +31,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
     }),
 
     AuthModule,
+
+    CategoryModule,
   ],
   controllers: [],
   providers: [],
