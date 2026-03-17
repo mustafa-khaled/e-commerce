@@ -19,13 +19,6 @@ import { AuthGuard } from '@/user/guard/auth.guard';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Post()
-  @Roles([UserRole.ADMIN])
-  @UseGuards(AuthGuard)
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoryService.create(createCategoryDto);
-  }
-
   @Get()
   findAll() {
     return this.categoryService.findAll();
@@ -36,6 +29,13 @@ export class CategoryController {
     return this.categoryService.findOne(id);
   }
 
+  @Post()
+  @Roles([UserRole.ADMIN])
+  @UseGuards(AuthGuard)
+  create(@Body() createCategoryDto: CreateCategoryDto) {
+    return this.categoryService.create(createCategoryDto);
+  }
+
   @Patch(':id')
   @Roles([UserRole.ADMIN])
   @UseGuards(AuthGuard)
@@ -43,13 +43,13 @@ export class CategoryController {
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    return this.categoryService.update(+id, updateCategoryDto);
+    return this.categoryService.update(id, updateCategoryDto);
   }
 
   @Delete(':id')
   @Roles([UserRole.ADMIN])
   @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
-    return this.categoryService.remove(+id);
+    return this.categoryService.remove(id);
   }
 }

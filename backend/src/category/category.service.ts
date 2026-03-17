@@ -9,6 +9,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Category } from './category.schema';
 import { isValidObjectId, Model } from 'mongoose';
 
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 @Injectable()
 export class CategoryService {
   constructor(
@@ -16,44 +20,71 @@ export class CategoryService {
     private readonly categoryModel: Model<Category>,
   ) {}
 
-  async create(createCategoryDto: CreateCategoryDto) {
-    const category = await this.categoryModel.findOne({
-      name: createCategoryDto.name,
-    });
-
-    if (category) throw new BadRequestException('Category already exists');
-    const newCategory = await this.categoryModel.create(createCategoryDto);
-    return {
-      status: 201,
-      message: 'Category created successfully',
-      data: newCategory,
-    };
-  }
-
   async findAll() {
+    const categories = await this.categoryModel.find();
+
     return {
-      status: 200,
-      message: 'This action returns all category',
-      data: await this.categoryModel.find(),
+      message: 'Categories fetched successfully',
+      length: categories.length,
+      data: categories,
     };
   }
 
   async findOne(id: string) {
-    if (!isValidObjectId(id)) throw new NotFoundException('Category not found');
+    if (!isValidObjectId(id))
+      throw new BadRequestException('Invalid category ID');
     const category = await this.categoryModel.findById(id);
-    if (!category) throw new NotFoundException('Category not found');
+
     return {
-      status: 200,
       message: 'Category fetched successfully',
       data: category,
     };
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async create(createCategoryDto: CreateCategoryDto) {
+    const category = await this.categoryModel.findOne({
+      name: {
+        $regex: `^${escapeRegex(createCategoryDto.name)}$`,
+        $options: 'i',
+      },
+    });
+
+    if (category) throw new BadRequestException('Category already exists');
+    const newCategory = await this.categoryModel.create(createCategoryDto);
+    return {
+      message: 'Category created successfully',
+      data: newCategory,
+    };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+    if (!isValidObjectId(id))
+      throw new BadRequestException('Invalid category ID');
+
+    const category = await this.categoryModel.findByIdAndUpdate(
+      id,
+      updateCategoryDto,
+      { new: true },
+    );
+
+    if (!category) throw new NotFoundException('Category not found');
+
+    return {
+      message: 'Category updated successfully',
+      data: category,
+    };
+  }
+
+  async remove(id: string) {
+    if (!isValidObjectId(id))
+      throw new BadRequestException('Invalid category ID');
+
+    const category = await this.categoryModel.findByIdAndDelete(id);
+
+    if (!category) throw new NotFoundException('Category not found');
+
+    return {
+      message: 'Category deleted successfully',
+    };
   }
 }

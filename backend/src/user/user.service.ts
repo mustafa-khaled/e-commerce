@@ -98,7 +98,7 @@ export class UserService {
       status: 200,
       message: 'User updated successfully',
       data: await this.userModel.findByIdAndUpdate(id, updateUserDto, {
-        returnDocument: 'after',
+        new: true,
       }),
     };
   }
