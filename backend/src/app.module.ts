@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
+import { SubCategoryModule } from './sub-category/sub-category.module';
 
 @Module({
   imports: [
@@ -33,6 +34,8 @@ import { CategoryModule } from './category/category.module';
     AuthModule,
 
     CategoryModule,
+
+    SubCategoryModule,
   ],
   controllers: [],
   providers: [],

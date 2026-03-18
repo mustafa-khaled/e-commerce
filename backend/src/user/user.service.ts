@@ -24,7 +24,6 @@ export class UserService {
 
     const hashedPassword = await this.hashPassword(createUserDto.password);
     return {
-      status: 200,
       message: 'User created successfully',
       data: await this.userModel.create({
         ...createUserDto,
@@ -64,7 +63,6 @@ export class UserService {
     ]);
 
     return {
-      status: 200,
       message: 'Users fetched successfully',
       data: users,
 
@@ -81,7 +79,6 @@ export class UserService {
     const user = await this.findUser(id);
 
     return {
-      status: 200,
       message: 'User fetched successfully',
       data: user,
     };
@@ -95,7 +92,6 @@ export class UserService {
     }
 
     return {
-      status: 200,
       message: 'User updated successfully',
       data: await this.userModel.findByIdAndUpdate(id, updateUserDto, {
         new: true,
@@ -108,7 +104,6 @@ export class UserService {
     await this.userModel.findByIdAndDelete(id);
 
     return {
-      status: 200,
       message: 'User deleted successfully',
     };
   }
@@ -130,7 +125,6 @@ export class UserService {
     const user = await this.findUser(id);
 
     return {
-      status: 200,
       message: 'User fetched successfully',
       data: user,
     };
@@ -144,7 +138,6 @@ export class UserService {
     }
 
     return {
-      status: 200,
       message: 'User updated successfully',
       data: await this.userModel.findByIdAndUpdate(id, updateUserDto, {
         new: true,
@@ -161,7 +154,6 @@ export class UserService {
     );
 
     return {
-      status: 200,
       message: 'User deleted successfully',
     };
   }

@@ -8,10 +8,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from './category.schema';
 import { isValidObjectId, Model } from 'mongoose';
-
-function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+import { escapeRegex } from '@/common/utils/escape-regex.util';
 
 @Injectable()
 export class CategoryService {
@@ -19,6 +16,18 @@ export class CategoryService {
     @InjectModel(Category.name)
     private readonly categoryModel: Model<Category>,
   ) {}
+
+  private validateId(id: string) {
+    if (!isValidObjectId(id))
+      throw new BadRequestException('Invalid category ID');
+  }
+
+  private async getCategoryById(id: string) {
+    this.validateId(id);
+    const category = await this.categoryModel.findById(id);
+    if (!category) throw new NotFoundException('Category not found');
+    return category;
+  }
 
   async findAll() {
     const categories = await this.categoryModel.find();
@@ -31,9 +40,7 @@ export class CategoryService {
   }
 
   async findOne(id: string) {
-    if (!isValidObjectId(id))
-      throw new BadRequestException('Invalid category ID');
-    const category = await this.categoryModel.findById(id);
+    const category = await this.getCategoryById(id);
 
     return {
       message: 'Category fetched successfully',
@@ -58,8 +65,7 @@ export class CategoryService {
   }
 
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {
-    if (!isValidObjectId(id))
-      throw new BadRequestException('Invalid category ID');
+    this.validateId(id);
 
     const category = await this.categoryModel.findByIdAndUpdate(
       id,
@@ -76,8 +82,7 @@ export class CategoryService {
   }
 
   async remove(id: string) {
-    if (!isValidObjectId(id))
-      throw new BadRequestException('Invalid category ID');
+    this.validateId(id);
 
     const category = await this.categoryModel.findByIdAndDelete(id);
 
