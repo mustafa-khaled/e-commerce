@@ -30,22 +30,22 @@ export class BrandController {
   }
 
   @Post()
-  @UseGuards(AuthGuard)
   @Roles([UserRole.ADMIN])
+  @UseGuards(AuthGuard)
   create(@Body() createBrandDto: CreateBrandDto) {
     return this.brandService.create(createBrandDto);
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard)
   @Roles([UserRole.ADMIN])
+  @UseGuards(AuthGuard)
   update(@Param('id') id: string, @Body() updateBrandDto: UpdateBrandDto) {
     return this.brandService.update(id, updateBrandDto);
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard)
   @Roles([UserRole.ADMIN])
+  @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
     return this.brandService.remove(id);
   }

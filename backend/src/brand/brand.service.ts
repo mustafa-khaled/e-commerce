@@ -1,13 +1,14 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
 import { Brand } from './brand.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { isValidObjectId, Model } from 'mongoose';
+import { Model } from 'mongoose';
+import {
+  findDocumentById,
+  validateObjectId,
+} from '@/common/utils/find-by-id.util';
+import { escapeRegex } from '@/common/utils/escape-regex.util';
 
 @Injectable()
 export class BrandService {
@@ -21,24 +22,13 @@ export class BrandService {
 
     return {
       message: 'Brands fetched successfully',
-      length: brands.length,
+      results: brands.length,
       data: brands,
     };
   }
 
-  private validateId(id: string) {
-    if (!isValidObjectId(id)) throw new BadRequestException('Invalid brand ID');
-  }
-
-  private async getBrandById(id: string) {
-    this.validateId(id);
-    const brand = await this.brandModel.findById(id);
-    if (!brand) throw new NotFoundException('Brand not found');
-    return brand;
-  }
-
   async findOne(id: string) {
-    const brand = await this.getBrandById(id);
+    const brand = await findDocumentById(this.brandModel, id, 'Brand');
 
     return {
       message: 'Brand fetched successfully',
@@ -47,13 +37,13 @@ export class BrandService {
   }
 
   async create(createBrandDto: CreateBrandDto) {
-    const { name, image } = createBrandDto;
-
-    const isExist = await this.brandModel.findOne({ name });
+    const isExist = await this.brandModel.findOne({
+      name: { $regex: `^${escapeRegex(createBrandDto.name)}$`, $options: 'i' },
+    });
 
     if (isExist) throw new BadRequestException('Brand already exists');
 
-    const brand = await this.brandModel.create({ name, image });
+    const brand = await this.brandModel.create(createBrandDto);
 
     return {
       message: 'Brand created successfully',
@@ -62,17 +52,22 @@ export class BrandService {
   }
 
   async update(id: string, updateBrandDto: UpdateBrandDto) {
-    const brand = await this.getBrandById(id);
+    const brand = await findDocumentById(this.brandModel, id, 'Brand');
 
-    const { name, image } = updateBrandDto;
-
-    if (name) {
-      const isExist = await this.brandModel.findOne({ name });
+    if (updateBrandDto.name) {
+      const isExist = await this.brandModel.findOne({
+        name: {
+          $regex: `^${escapeRegex(updateBrandDto.name)}$`,
+          $options: 'i',
+        },
+        _id: { $ne: id },
+      });
       if (isExist) throw new BadRequestException('Brand already exists');
     }
 
-    brand.name = name || brand.name;
-    brand.image = image || brand.image;
+    // Using Object.assign or discrete updates with ?? to handle empty strings/falsy values correctly
+    brand.name = updateBrandDto.name ?? brand.name;
+    brand.image = updateBrandDto.image ?? brand.image;
 
     await brand.save();
 
@@ -83,7 +78,7 @@ export class BrandService {
   }
 
   async remove(id: string) {
-    const brand = await this.getBrandById(id);
+    const brand = await findDocumentById(this.brandModel, id, 'Brand');
 
     await brand.deleteOne();
 

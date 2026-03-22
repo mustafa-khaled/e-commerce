@@ -3,13 +3,13 @@ import { HydratedDocument } from 'mongoose';
 
 export type BrandDocument = HydratedDocument<Brand>;
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, versionKey: false })
 export class Brand {
-  @Prop({ required: true, unique: true, minlength: 3, maxLength: 100 })
+  @Prop({ required: true, unique: true, minLength: 3, maxLength: 100 })
   name: string;
 
-  @Prop({ required: false })
-  image: string;
+  @Prop()
+  image?: string;
 
   @Prop({ select: false })
   __v: number;

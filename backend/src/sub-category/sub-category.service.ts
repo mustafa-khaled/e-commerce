@@ -1,15 +1,15 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateSubCategoryDto } from './dto/create-sub-category.dto';
 import { UpdateSubCategoryDto } from './dto/update-sub-category.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { SubCategory } from './sub-category.schema';
-import { isValidObjectId, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { escapeRegex } from '@/common/utils/escape-regex.util';
 import { CategoryService } from '@/category/category.service';
+import {
+  findDocumentById,
+  validateObjectId,
+} from '@/common/utils/find-by-id.util';
 
 @Injectable()
 export class SubCategoryService {
@@ -19,30 +19,20 @@ export class SubCategoryService {
     private readonly categoryService: CategoryService,
   ) {}
 
-  private validateId(id: string) {
-    if (!isValidObjectId(id))
-      throw new BadRequestException('Invalid sub-category ID');
-  }
-
-  private async getSubCategoryById(id: string) {
-    this.validateId(id);
-    const subCategory = await this.subCategoryModel.findById(id);
-    if (!subCategory) throw new NotFoundException('Sub-category not found');
-    return subCategory;
-  }
-
   async findAll() {
     const subCategories = await this.subCategoryModel.find();
 
     return {
       message: 'Sub-categories fetched successfully',
-      length: subCategories.length,
+      results: subCategories.length,
       data: subCategories,
     };
   }
 
   async findOne(id: string) {
-    const subCategory = await this.getSubCategoryById(id);
+    const subCategory = await (
+      await findDocumentById(this.subCategoryModel, id, 'Sub-category')
+    ).populate('category');
 
     return {
       message: 'Sub-category fetched successfully',
@@ -51,21 +41,17 @@ export class SubCategoryService {
   }
 
   async create(createSubCategoryDto: CreateSubCategoryDto) {
-    const subCategory = await this.subCategoryModel.findOne({
+    const isExist = await this.subCategoryModel.findOne({
       name: {
         $regex: `^${escapeRegex(createSubCategoryDto.name)}$`,
         $options: 'i',
       },
     });
 
-    if (subCategory)
-      throw new BadRequestException('Sub-category already exists');
+    if (isExist) throw new BadRequestException('Sub-category already exists');
 
-    const category = await this.categoryService.findOne(
-      createSubCategoryDto.category,
-    );
-
-    if (!category) throw new BadRequestException('Category not found');
+    // categoryService.findOne throws its own NotFoundException so we don't need a null check here
+    await this.categoryService.findOne(createSubCategoryDto.category);
 
     const newSubCategory =
       await this.subCategoryModel.create(createSubCategoryDto);
@@ -77,7 +63,23 @@ export class SubCategoryService {
   }
 
   async update(id: string, updateSubCategoryDto: UpdateSubCategoryDto) {
-    this.validateId(id);
+    validateObjectId(id, 'Sub-category');
+
+    if (updateSubCategoryDto.name) {
+      const isExist = await this.subCategoryModel.findOne({
+        name: {
+          $regex: `^${escapeRegex(updateSubCategoryDto.name)}$`,
+          $options: 'i',
+        },
+        _id: { $ne: id },
+      });
+      if (isExist) throw new BadRequestException('Sub-category already exists');
+    }
+
+    if (updateSubCategoryDto.category) {
+      // Validate that the new parent category exists
+      await this.categoryService.findOne(updateSubCategoryDto.category);
+    }
 
     const subCategory = await this.subCategoryModel.findByIdAndUpdate(
       id,
@@ -85,7 +87,9 @@ export class SubCategoryService {
       { new: true },
     );
 
-    if (!subCategory) throw new NotFoundException('Sub-category not found');
+    if (!subCategory) {
+      throw new BadRequestException('Sub-category not found or invalid ID');
+    }
 
     return {
       message: 'Sub-category updated successfully',
@@ -94,11 +98,13 @@ export class SubCategoryService {
   }
 
   async remove(id: string) {
-    this.validateId(id);
+    const subCategory = await findDocumentById(
+      this.subCategoryModel,
+      id,
+      'Sub-category',
+    );
 
-    const subCategory = await this.subCategoryModel.findByIdAndDelete(id);
-
-    if (!subCategory) throw new NotFoundException('Sub-category not found');
+    await subCategory.deleteOne();
 
     return {
       message: 'Sub-category deleted successfully',

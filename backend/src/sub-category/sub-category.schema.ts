@@ -3,9 +3,9 @@ import { HydratedDocument, Types } from 'mongoose';
 
 export type SubCategoryDocument = HydratedDocument<SubCategory>;
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, versionKey: false })
 export class SubCategory {
-  @Prop({ required: true, type: String, minlength: 3, maxLength: 30 })
+  @Prop({ required: true, unique: true, type: String, minlength: 3, maxLength: 30 })
   name: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Category', required: true })

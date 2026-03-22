@@ -1,10 +1,11 @@
-import { IsMongoId, IsString, Length } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class CreateSubCategoryDto {
+  @IsNotEmpty()
   @Length(3, 30)
-  @IsString()
   name: string;
 
+  @IsNotEmpty()
   @IsMongoId()
   category: string;
 }
