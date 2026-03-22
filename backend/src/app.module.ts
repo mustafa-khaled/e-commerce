@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { SubCategoryModule } from './sub-category/sub-category.module';
+import { BrandModule } from './brand/brand.module';
 
 @Module({
   imports: [
@@ -36,6 +37,8 @@ import { SubCategoryModule } from './sub-category/sub-category.module';
     CategoryModule,
 
     SubCategoryModule,
+
+    BrandModule,
   ],
   controllers: [],
   providers: [],
