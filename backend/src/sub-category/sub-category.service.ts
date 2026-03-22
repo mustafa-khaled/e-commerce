@@ -9,12 +9,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { SubCategory } from './sub-category.schema';
 import { isValidObjectId, Model } from 'mongoose';
 import { escapeRegex } from '@/common/utils/escape-regex.util';
+import { CategoryService } from '@/category/category.service';
 
 @Injectable()
 export class SubCategoryService {
   constructor(
     @InjectModel(SubCategory.name)
     private readonly subCategoryModel: Model<SubCategory>,
+    private readonly categoryService: CategoryService,
   ) {}
 
   private validateId(id: string) {
@@ -58,6 +60,12 @@ export class SubCategoryService {
 
     if (subCategory)
       throw new BadRequestException('Sub-category already exists');
+
+    const category = await this.categoryService.findOne(
+      createSubCategoryDto.category,
+    );
+
+    if (!category) throw new BadRequestException('Category not found');
 
     const newSubCategory =
       await this.subCategoryModel.create(createSubCategoryDto);
