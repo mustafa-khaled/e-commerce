@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
 import { Roles } from '../decorator/roles.decorator';
+import { UserRole } from '../enums/user-role.enum';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -19,7 +20,10 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
-    const roles = this.reflector.get(Roles, context.getHandler());
+    const roles = this.reflector.getAllAndOverride<UserRole[]>(Roles, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     if (!roles) {
       return true;

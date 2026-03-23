@@ -65,7 +65,6 @@ export class BrandService {
       if (isExist) throw new BadRequestException('Brand already exists');
     }
 
-    // Using Object.assign or discrete updates with ?? to handle empty strings/falsy values correctly
     brand.name = updateBrandDto.name ?? brand.name;
     brand.image = updateBrandDto.image ?? brand.image;
 
