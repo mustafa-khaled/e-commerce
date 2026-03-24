@@ -40,7 +40,10 @@ export class CouponService {
 
     if (isExist) throw new BadRequestException('Coupon already exists');
 
-    const coupon = await this.couponModel.create(createCouponDto);
+    const coupon = await this.couponModel.create({
+      ...createCouponDto,
+      expiryDate: new Date(createCouponDto.expiryDate),
+    });
 
     return {
       message: 'Coupon created successfully',
@@ -64,7 +67,9 @@ export class CouponService {
 
     coupon.name = updateCouponDto.name ?? coupon.name;
     coupon.discount = updateCouponDto.discount ?? coupon.discount;
-    coupon.expiryDate = updateCouponDto.expiryDate ?? coupon.expiryDate;
+    coupon.expiryDate = new Date(
+      updateCouponDto.expiryDate ?? coupon.expiryDate,
+    );
 
     await coupon.save();
 
