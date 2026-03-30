@@ -1,5 +1,4 @@
 import {
-  IsMongoId,
   IsNumber,
   IsOptional,
   IsString,
@@ -22,8 +21,4 @@ export class CreateRequestProductDto {
   @IsOptional()
   @IsString()
   category: string;
-
-  @IsString()
-  @IsMongoId()
-  user: string;
 }

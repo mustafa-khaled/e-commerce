@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateRequestProductDto } from './dto/create-request-product.dto';
 import { UpdateRequestProductDto } from './dto/update-request-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -39,9 +39,27 @@ export class RequestProductService {
     };
   }
 
-  async create(createRequestProductDto: CreateRequestProductDto) {
+  async create(
+    createRequestProductDto: CreateRequestProductDto,
+    userId: string,
+  ) {
+    const reqProduct = await this.requestModel.findOne({
+      user: userId,
+      titleNeed: createRequestProductDto.titleNeed,
+    });
+
+    if (reqProduct) {
+      throw new BadRequestException('You have already requested this product');
+    }
+
+    const newReqProduct = await this.requestModel.create({
+      ...createRequestProductDto,
+      user: userId,
+    });
+
     return {
       message: 'Request product created successfully',
+      data: newReqProduct,
     };
   }
 
