@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { CreateRequestProductDto } from './dto/create-request-product.dto';
 import { UpdateRequestProductDto } from './dto/update-request-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -8,6 +12,8 @@ import {
 } from './request-product.schema';
 import { Model } from 'mongoose';
 import { findDocumentById } from '@/common/utils/find-by-id.util';
+import { AuthUser } from '@/common/interfaces/auth-user.interface';
+import { UserRole } from '@/user/enums/user-role.enum';
 
 @Injectable()
 export class RequestProductService {
@@ -15,6 +21,18 @@ export class RequestProductService {
     @InjectModel(RequestProduct.name)
     private readonly requestModel: Model<RequestProductDocument>,
   ) {}
+
+  private assertOwnership(
+    requestProduct: RequestProductDocument,
+    userId: string,
+    action: string,
+  ): void {
+    if (requestProduct.user.toString() !== userId) {
+      throw new ForbiddenException(
+        `You are not authorized to ${action} this request`,
+      );
+    }
+  }
 
   async findAll() {
     const requests = await this.requestModel.find();
@@ -26,12 +44,16 @@ export class RequestProductService {
     };
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, user: AuthUser) {
     const requestProduct = await findDocumentById(
       this.requestModel,
       id,
       'RequestProduct',
     );
+
+    if (user.role === UserRole.USER) {
+      this.assertOwnership(requestProduct, user._id, 'view');
+    }
 
     return {
       message: 'Request product fetched successfully',
@@ -43,12 +65,12 @@ export class RequestProductService {
     createRequestProductDto: CreateRequestProductDto,
     userId: string,
   ) {
-    const reqProduct = await this.requestModel.findOne({
+    const existing = await this.requestModel.findOne({
       user: userId,
       titleNeed: createRequestProductDto.titleNeed,
     });
 
-    if (reqProduct) {
+    if (existing) {
       throw new BadRequestException('You have already requested this product');
     }
 
@@ -63,18 +85,44 @@ export class RequestProductService {
     };
   }
 
-  async update(id: string, updateRequestProductDto: UpdateRequestProductDto) {
-    return {
-      message: 'Request product updated successfully',
-    };
-  }
-
-  async remove(id: string) {
+  async update(
+    id: string,
+    updateRequestProductDto: UpdateRequestProductDto,
+    userId: string,
+  ) {
     const requestProduct = await findDocumentById(
       this.requestModel,
       id,
       'RequestProduct',
     );
+
+    this.assertOwnership(requestProduct, userId, 'update');
+
+    Object.assign(
+      requestProduct,
+      Object.fromEntries(
+        Object.entries(updateRequestProductDto).filter(
+          ([, v]) => v !== undefined,
+        ),
+      ),
+    );
+
+    await requestProduct.save();
+
+    return {
+      message: 'Request product updated successfully',
+      data: requestProduct,
+    };
+  }
+
+  async remove(id: string, userId: string) {
+    const requestProduct = await findDocumentById(
+      this.requestModel,
+      id,
+      'RequestProduct',
+    );
+
+    this.assertOwnership(requestProduct, userId, 'delete');
 
     await requestProduct.deleteOne();
 

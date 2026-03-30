@@ -7,42 +7,42 @@ import {
   Param,
   Delete,
   Req,
+  UseGuards,
   ForbiddenException,
 } from '@nestjs/common';
 import { RequestProductService } from './request-product.service';
 import { CreateRequestProductDto } from './dto/create-request-product.dto';
 import { UpdateRequestProductDto } from './dto/update-request-product.dto';
-import { UseGuards } from '@nestjs/common';
 import { Roles } from '@/user/decorator/roles.decorator';
 import { UserRole } from '@/user/enums/user-role.enum';
 import { AuthGuard } from '@/user/guard/auth.guard';
+import { AuthUser } from '@/common/interfaces/auth-user.interface';
 
 @Controller('request-product')
+@UseGuards(AuthGuard)
 export class RequestProductController {
   constructor(private readonly requestProductService: RequestProductService) {}
 
   @Get()
   @Roles([UserRole.ADMIN])
-  @UseGuards(AuthGuard)
   findAll() {
     return this.requestProductService.findAll();
   }
 
   @Get(':id')
-  @Roles([UserRole.ADMIN])
-  @UseGuards(AuthGuard)
-  findOne(@Param('id') id: string) {
-    return this.requestProductService.findOne(id);
+  @Roles([UserRole.ADMIN, UserRole.USER])
+  findOne(@Param('id') id: string, @Req() req: { user: AuthUser }) {
+    return this.requestProductService.findOne(id, req.user);
   }
 
   @Post()
   @Roles([UserRole.USER])
-  @UseGuards(AuthGuard)
-  create(@Body() createRequestProductDto: CreateRequestProductDto, @Req() req) {
-    if (req.user.role !== UserRole.USER) {
-      throw new ForbiddenException(
-        'You are not authorized to create a request product',
-      );
+  create(
+    @Body() createRequestProductDto: CreateRequestProductDto,
+    @Req() req: { user: AuthUser },
+  ) {
+    if (req.user.role === UserRole.ADMIN) {
+      throw new ForbiddenException('Admins cannot create product requests');
     }
 
     return this.requestProductService.create(
@@ -53,18 +53,29 @@ export class RequestProductController {
 
   @Patch(':id')
   @Roles([UserRole.USER])
-  @UseGuards(AuthGuard)
   update(
     @Param('id') id: string,
     @Body() updateRequestProductDto: UpdateRequestProductDto,
+    @Req() req: { user: AuthUser },
   ) {
-    return this.requestProductService.update(id, updateRequestProductDto);
+    if (req.user.role === UserRole.ADMIN) {
+      throw new ForbiddenException('Admins cannot edit product requests');
+    }
+
+    return this.requestProductService.update(
+      id,
+      updateRequestProductDto,
+      req.user._id,
+    );
   }
 
   @Delete(':id')
   @Roles([UserRole.USER])
-  @UseGuards(AuthGuard)
-  remove(@Param('id') id: string) {
-    return this.requestProductService.remove(id);
+  remove(@Param('id') id: string, @Req() req: { user: AuthUser }) {
+    if (req.user.role === UserRole.ADMIN) {
+      throw new ForbiddenException('Admins cannot delete product requests');
+    }
+
+    return this.requestProductService.remove(id, req.user._id);
   }
 }

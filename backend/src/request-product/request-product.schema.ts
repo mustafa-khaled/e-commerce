@@ -21,9 +21,12 @@ export class RequestProduct {
   @Prop({ type: Types.ObjectId, ref: User.name, required: true })
   user: Types.ObjectId;
 
-  @Prop({ select: false })
-  __v: number;
+
 }
 
 export const RequestProductSchema =
   SchemaFactory.createForClass(RequestProduct);
+
+// RequestProductSchema.pre('findOne', function () {
+//   this.populate('user');
+// });
