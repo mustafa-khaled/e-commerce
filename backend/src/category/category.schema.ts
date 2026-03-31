@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema, Types } from 'mongoose';
 
 export type CategoryDocument = HydratedDocument<Category>;
 
@@ -10,6 +10,9 @@ export class Category {
 
   @Prop({ type: String })
   image?: string;
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'TaxRule', default: null })
+  taxRule?: Types.ObjectId;
 
   @Prop({ select: false })
   __v: number;
