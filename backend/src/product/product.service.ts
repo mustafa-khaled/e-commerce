@@ -6,16 +6,31 @@ import { Product, ProductDocument } from './product.schema';
 import { Model } from 'mongoose';
 import { findDocumentById } from '@/common/utils/find-by-id.util';
 import { escapeRegex } from '@/common/utils/escape-regex.util';
+import { Category, CategoryDocument } from '@/category/category.schema';
+import {
+  SubCategory,
+  SubCategoryDocument,
+} from '@/sub-category/sub-category.schema';
+import { Brand, BrandDocument } from '@/brand/brand.schema';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel(Product.name)
     private readonly productModel: Model<ProductDocument>,
+
+    @InjectModel(Category.name)
+    private readonly categoryModel: Model<CategoryDocument>,
+
+    @InjectModel(SubCategory.name)
+    private readonly subCategoryModel: Model<SubCategoryDocument>,
+
+    @InjectModel(Brand.name)
+    private readonly brandModel: Model<BrandDocument>,
   ) {}
 
-  findAll() {
-    const products = this.productModel.find().exec();
+  async findAll() {
+    const products = await this.productModel.find();
 
     return {
       data: products,
@@ -34,13 +49,41 @@ export class ProductService {
 
   async create(createProductDto: CreateProductDto) {
     const isExist = await this.productModel.findOne({
-      name: {
+      title: {
         $regex: `^${escapeRegex(createProductDto.title)}$`,
         $options: 'i',
       },
     });
 
     if (isExist) throw new BadRequestException('Product already exists');
+
+    const category = await findDocumentById(
+      this.categoryModel,
+      createProductDto.category,
+      'Category',
+    );
+
+    if (!category) throw new BadRequestException('Category not found');
+
+    if (createProductDto.subCategory) {
+      const subCategory = await findDocumentById(
+        this.subCategoryModel,
+        createProductDto.subCategory,
+        'SubCategory',
+      );
+
+      if (!subCategory) throw new BadRequestException('SubCategory not found');
+    }
+
+    if (createProductDto.brand) {
+      const brand = await findDocumentById(
+        this.brandModel,
+        createProductDto.brand,
+        'Brand',
+      );
+
+      if (!brand) throw new BadRequestException('Brand not found');
+    }
 
     const product = await this.productModel.create(createProductDto);
 
@@ -74,7 +117,6 @@ export class ProductService {
 
     return {
       message: 'Product deleted successfully',
-      data: product,
     };
   }
 }
