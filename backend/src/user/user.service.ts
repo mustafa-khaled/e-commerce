@@ -36,7 +36,7 @@ export class UserService {
     const {
       page = 1,
       limit = 10,
-      sortBy = 'createdAt',
+      sort = 'createdAt',
       sortOrder = 'desc',
       name,
       email,
@@ -56,7 +56,7 @@ export class UserService {
         .find(filter)
         .skip(skip)
         .limit(limit)
-        .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })
+        .sort({ [sort]: sortOrder === 'asc' ? 1 : -1 })
         .exec(),
 
       this.userModel.countDocuments(filter),

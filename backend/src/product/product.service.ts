@@ -12,6 +12,7 @@ import {
   SubCategoryDocument,
 } from '@/sub-category/sub-category.schema';
 import { Brand, BrandDocument } from '@/brand/brand.schema';
+import { QueryProductDto } from './dto/query-product.dto';
 
 @Injectable()
 export class ProductService {
@@ -29,7 +30,21 @@ export class ProductService {
     private readonly brandModel: Model<BrandDocument>,
   ) {}
 
-  async findAll() {
+  async findAll(query: QueryProductDto) {
+    const requestQuery = { ...query };
+    const removeFields = [
+      'page',
+      'limit',
+      'sort',
+      'sortOrder',
+      'keyword',
+      'category',
+    ];
+
+    removeFields.forEach((field) => delete requestQuery[field]);
+
+    console.log(requestQuery);
+
     const products = await this.productModel.find();
 
     return {

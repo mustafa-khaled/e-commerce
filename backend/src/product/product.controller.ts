@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -14,13 +15,14 @@ import { UseGuards } from '@nestjs/common';
 import { Roles } from '@/user/decorator/roles.decorator';
 import { UserRole } from '@/user/enums/user-role.enum';
 import { AuthGuard } from '@/user/guard/auth.guard';
+import { QueryProductDto } from './dto/query-product.dto';
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  findAll() {
-    return this.productService.findAll();
+  findAll(@Query() query: QueryProductDto) {
+    return this.productService.findAll(query);
   }
 
   @Get(':id')
