@@ -31,7 +31,7 @@ export class ProductService {
   ) {}
 
   async findAll(query: QueryProductDto) {
-    const requestQuery = { ...query };
+    const requestQuery: Record<string, unknown> = { ...query };
     const removeFields = [
       'page',
       'limit',
@@ -39,16 +39,70 @@ export class ProductService {
       'sortOrder',
       'keyword',
       'category',
+      'fields',
     ];
 
     removeFields.forEach((field) => delete requestQuery[field]);
 
-    console.log(requestQuery);
+    const filterString = JSON.stringify(requestQuery).replace(
+      /\b(gte|lte|gt|lt)\b/g,
+      (match) => `$${match}`,
+    );
 
-    const products = await this.productModel.find();
+    const parsed: unknown = JSON.parse(filterString);
+
+    const filter: Record<string, unknown> =
+      typeof parsed === 'object' && parsed !== null
+        ? (parsed as Record<string, unknown>)
+        : {};
+
+    if (query.category) {
+      filter.category = query.category;
+    }
+
+    if (query.keyword) {
+      filter.title = {
+        $regex: escapeRegex(query.keyword),
+      };
+
+      filter.description = {
+        $regex: escapeRegex(query.keyword),
+      };
+    }
+
+    const page = query.page && query.page > 0 ? query.page : 1;
+    const limit = query.limit && query.limit > 0 ? query.limit : 10;
+    const skip = (page - 1) * limit;
+
+    let sortQuery: Record<string, 1 | -1> = { createdAt: -1 };
+    if (query.sort) {
+      const order: 1 | -1 = query.sortOrder === 'asc' ? 1 : -1;
+      sortQuery = { [query.sort]: order };
+    }
+
+    const fields = query.fields
+      ? (query.fields as unknown as string).split(',').join(' ')
+      : '';
+
+    const [products, total] = await Promise.all([
+      this.productModel
+        .find(filter)
+        .sort(sortQuery)
+        .skip(skip)
+        .limit(limit)
+        .select(fields),
+
+      this.productModel.countDocuments(filter),
+    ]);
 
     return {
       data: products,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
       message: 'Products fetched successfully',
     };
   }

@@ -16,7 +16,17 @@ class NumberFilter {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
+  gt?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   lte?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  lt?: number;
 }
 
 export class QueryProductDto extends PaginationDto {
@@ -33,7 +43,7 @@ export class QueryProductDto extends PaginationDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => NumberFilter)
-  ratingAverage?: NumberFilter;
+  ratingsAverage?: NumberFilter;
 
   @IsOptional()
   @IsString()
@@ -42,4 +52,8 @@ export class QueryProductDto extends PaginationDto {
   @IsOptional()
   @IsString()
   category?: string;
+
+  @IsOptional()
+  @IsString()
+  fields?: string[];
 }
