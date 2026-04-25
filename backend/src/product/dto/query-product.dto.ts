@@ -55,5 +55,5 @@ export class QueryProductDto extends PaginationDto {
 
   @IsOptional()
   @IsString()
-  fields?: string[];
+  fields?: string;
 }

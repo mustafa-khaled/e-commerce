@@ -31,43 +31,33 @@ export class ProductService {
   ) {}
 
   async findAll(query: QueryProductDto) {
-    const requestQuery: Record<string, unknown> = { ...query };
-    const removeFields = [
-      'page',
-      'limit',
-      'sort',
-      'sortOrder',
-      'keyword',
-      'category',
-      'fields',
-    ];
+    const filter: Record<string, unknown> = {};
 
-    removeFields.forEach((field) => delete requestQuery[field]);
+    const numberFilterFields = ['price', 'sold', 'ratingsAverage'] as const;
 
-    const filterString = JSON.stringify(requestQuery).replace(
-      /\b(gte|lte|gt|lt)\b/g,
-      (match) => `$${match}`,
-    );
-
-    const parsed: unknown = JSON.parse(filterString);
-
-    const filter: Record<string, unknown> =
-      typeof parsed === 'object' && parsed !== null
-        ? (parsed as Record<string, unknown>)
-        : {};
+    for (const field of numberFilterFields) {
+      if (query[field]) {
+        const mongoFilter: Record<string, number> = {};
+        for (const op of ['gte', 'lte', 'gt', 'lt'] as const) {
+          if (query[field]![op] !== undefined) {
+            mongoFilter[`$${op}`] = query[field]![op]!;
+          }
+        }
+        if (Object.keys(mongoFilter).length > 0) {
+          filter[field] = mongoFilter;
+        }
+      }
+    }
 
     if (query.category) {
       filter.category = query.category;
     }
 
     if (query.keyword) {
-      filter.title = {
-        $regex: escapeRegex(query.keyword),
-      };
-
-      filter.description = {
-        $regex: escapeRegex(query.keyword),
-      };
+      filter.$or = [
+        { title: { $regex: escapeRegex(query.keyword), $options: 'i' } },
+        { description: { $regex: escapeRegex(query.keyword), $options: 'i' } },
+      ];
     }
 
     const page = query.page && query.page > 0 ? query.page : 1;
@@ -163,7 +153,41 @@ export class ProductService {
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
-    await findDocumentById(this.productModel, id, 'Product');
+    const product = await findDocumentById(this.productModel, id, 'Product');
+
+    if (product.quantity < (updateProductDto.sold || 0)) {
+      throw new BadRequestException('Not enough quantity');
+    }
+
+    if (updateProductDto.category) {
+      const category = await findDocumentById(
+        this.categoryModel,
+        updateProductDto.category,
+        'Category',
+      );
+
+      if (!category) throw new BadRequestException('Category not found');
+    }
+
+    if (updateProductDto.subCategory) {
+      const subCategory = await findDocumentById(
+        this.subCategoryModel,
+        updateProductDto.subCategory,
+        'SubCategory',
+      );
+
+      if (!subCategory) throw new BadRequestException('SubCategory not found');
+    }
+
+    if (updateProductDto.brand) {
+      const brand = await findDocumentById(
+        this.brandModel,
+        updateProductDto.brand,
+        'Brand',
+      );
+
+      if (!brand) throw new BadRequestException('Brand not found');
+    }
 
     const updatedProduct = await this.productModel.findByIdAndUpdate(
       id,
