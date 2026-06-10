@@ -5,7 +5,13 @@ export type SupplierDocument = HydratedDocument<Supplier>;
 
 @Schema({ timestamps: true, versionKey: false })
 export class Supplier {
-  @Prop({ required: true, unique: true, type: String, minLength: 3, maxLength: 100 })
+  @Prop({
+    required: true,
+    unique: true,
+    type: String,
+    minLength: 3,
+    maxLength: 100,
+  })
   name: string;
 
   @Prop({ required: true, type: String })

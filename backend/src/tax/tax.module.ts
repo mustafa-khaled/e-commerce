@@ -5,7 +5,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TaxRule, TaxRuleSchema } from './tax.schema';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: TaxRule.name, schema: TaxRuleSchema }])],
+  imports: [
+    MongooseModule.forFeature([{ name: TaxRule.name, schema: TaxRuleSchema }]),
+  ],
   controllers: [TaxController],
   providers: [TaxService],
 })

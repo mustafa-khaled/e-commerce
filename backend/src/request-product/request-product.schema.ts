@@ -20,8 +20,6 @@ export class RequestProduct {
 
   @Prop({ type: Types.ObjectId, ref: User.name, required: true })
   user: Types.ObjectId;
-
-
 }
 
 export const RequestProductSchema =

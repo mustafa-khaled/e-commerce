@@ -55,7 +55,7 @@ export class AuthController {
   /**
    * @desc    Change user password
    * @route   POST /api/v1/auth/change-password
-   * @access  Public 
+   * @access  Public
    */
   @Post('change-password')
   changePassword(@Body() changePasswordDto: SigninDto) {

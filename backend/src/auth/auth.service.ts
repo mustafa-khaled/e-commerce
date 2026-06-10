@@ -49,7 +49,7 @@ export class AuthService {
   }
 
   async login(loginDto: SigninDto) {
-    let user = await this.userModel
+    const user = await this.userModel
       .findOne({
         email: loginDto.email,
       })

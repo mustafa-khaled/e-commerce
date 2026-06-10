@@ -4,8 +4,8 @@ import { HydratedDocument } from 'mongoose';
 export type TaxDocument = HydratedDocument<TaxRule>;
 
 export enum TaxClass {
-  STANDARD = 'standard',   // 14% VAT
-  EXEMPT   = 'exempt',     // 0%
+  STANDARD = 'standard', // 14% VAT
+  EXEMPT = 'exempt', // 0%
 }
 
 @Schema({ timestamps: true, versionKey: false })

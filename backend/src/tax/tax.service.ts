@@ -18,8 +18,20 @@ export class TaxService implements OnModuleInit {
     const count = await this.taxRuleModel.countDocuments();
     if (count === 0) {
       await this.taxRuleModel.insertMany([
-        { name: 'Egypt Standard VAT', taxClass: TaxClass.STANDARD, rate: 14, appliesToShipping: false, isActive: true },
-        { name: 'Tax Exempt', taxClass: TaxClass.EXEMPT, rate: 0, appliesToShipping: false, isActive: true },
+        {
+          name: 'Egypt Standard VAT',
+          taxClass: TaxClass.STANDARD,
+          rate: 14,
+          appliesToShipping: false,
+          isActive: true,
+        },
+        {
+          name: 'Tax Exempt',
+          taxClass: TaxClass.EXEMPT,
+          rate: 0,
+          appliesToShipping: false,
+          isActive: true,
+        },
       ]);
       console.log('🌱 Seeded default tax rules for Egypt.');
     }
@@ -43,8 +55,13 @@ export class TaxService implements OnModuleInit {
   }
 
   async create(createTaxDto: CreateTaxDto) {
-    const isExist = await this.taxRuleModel.findOne({ taxClass: createTaxDto.taxClass });
-    if (isExist) throw new BadRequestException(`Tax rule with class "${createTaxDto.taxClass}" already exists`);
+    const isExist = await this.taxRuleModel.findOne({
+      taxClass: createTaxDto.taxClass,
+    });
+    if (isExist)
+      throw new BadRequestException(
+        `Tax rule with class "${createTaxDto.taxClass}" already exists`,
+      );
 
     const newTaxRule = await this.taxRuleModel.create(createTaxDto);
     return {
@@ -59,7 +76,10 @@ export class TaxService implements OnModuleInit {
         taxClass: updateTaxDto.taxClass,
         _id: { $ne: id },
       });
-      if (isExist) throw new BadRequestException(`Tax rule with class "${updateTaxDto.taxClass}" already exists`);
+      if (isExist)
+        throw new BadRequestException(
+          `Tax rule with class "${updateTaxDto.taxClass}" already exists`,
+        );
     }
 
     const taxRule = await this.taxRuleModel.findByIdAndUpdate(
@@ -80,7 +100,7 @@ export class TaxService implements OnModuleInit {
 
   async remove(id: string) {
     const taxRule = await findDocumentById(this.taxRuleModel, id, 'TaxRule');
-    
+
     // We soft delete tax rules, never hard delete, to keep audit logs for existing orders intact
     taxRule.isActive = false;
     await taxRule.save();

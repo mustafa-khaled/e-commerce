@@ -115,7 +115,7 @@ const brandsData = [
   { name: 'IKEA' },
   { name: 'Philips' },
   { name: 'The North Face' },
-  { name: 'Levi\'s' },
+  { name: "Levi's" },
   { name: 'Penguin Books' },
 ];
 
@@ -207,9 +207,7 @@ function buildProducts(
         'Industry-leading noise cancelling headphones with exceptional sound quality, 30-hour battery life, and ultra-comfortable design.',
       quantity: 100,
       imageCover: 'https://placehold.co/600x600?text=Sony+WH1000XM5',
-      images: [
-        'https://placehold.co/600x600?text=Sony+XM5+Case',
-      ],
+      images: ['https://placehold.co/600x600?text=Sony+XM5+Case'],
       sold: 230,
       price: 11999,
       priceAfterDiscount: 9999,
@@ -275,20 +273,18 @@ function buildProducts(
       ratingsQuantity: 215,
     },
     {
-      title: 'Levi\'s 501 Original Fit Jeans',
+      title: "Levi's 501 Original Fit Jeans",
       description:
         'The iconic straight-fit jean that started it all. Made with premium cotton denim, button fly, and a classic silhouette that never goes out of style.',
       quantity: 150,
       imageCover: 'https://placehold.co/600x600?text=Levis+501+Jeans',
-      images: [
-        'https://placehold.co/600x600?text=Levis+501+Back',
-      ],
+      images: ['https://placehold.co/600x600?text=Levis+501+Back'],
       sold: 310,
       price: 2499,
       colors: ['#00008B', '#4682B4', '#1C1C1E'],
       category: catMap['Fashion'],
       subCategory: subCatMap['Men Clothing'],
-      brand: brandMap['Levi\'s'],
+      brand: brandMap["Levi's"],
       ratingsAverage: 4.3,
       ratingsQuantity: 478,
     },
@@ -333,9 +329,7 @@ function buildProducts(
         'Fully automatic espresso machine with LatteGo milk system, intuitive touch display, 5 coffee varieties, and ceramic grinders for perfect taste.',
       quantity: 20,
       imageCover: 'https://placehold.co/600x600?text=Philips+Espresso+3200',
-      images: [
-        'https://placehold.co/600x600?text=Philips+3200+Detail',
-      ],
+      images: ['https://placehold.co/600x600?text=Philips+3200+Detail'],
       sold: 38,
       price: 24999,
       priceAfterDiscount: 21999,
@@ -455,9 +449,7 @@ function buildProducts(
         'Durable and versatile 28L daypack with a dedicated laptop compartment, FlexVent suspension system, and water-resistant fabric for everyday adventures.',
       quantity: 70,
       imageCover: 'https://placehold.co/600x600?text=TNF+Borealis+Backpack',
-      images: [
-        'https://placehold.co/600x600?text=Borealis+Interior',
-      ],
+      images: ['https://placehold.co/600x600?text=Borealis+Interior'],
       sold: 265,
       price: 3499,
       colors: ['#1C1C1E', '#006400', '#4682B4'],
@@ -556,9 +548,7 @@ function buildProducts(
         'At-home IPL hair removal system with SmartSkin sensor, over 450,000 flashes, and 4 attachments for body, face, bikini, and underarms.',
       quantity: 30,
       imageCover: 'https://placehold.co/600x600?text=Philips+Lumea+IPL',
-      images: [
-        'https://placehold.co/600x600?text=Lumea+Attachments',
-      ],
+      images: ['https://placehold.co/600x600?text=Lumea+Attachments'],
       sold: 55,
       price: 14999,
       priceAfterDiscount: 12499,
@@ -599,7 +589,7 @@ async function seed() {
   const categories = await CategoryModel.insertMany(categoriesData);
   const catMap: Record<string, Types.ObjectId> = {};
   for (const cat of categories) {
-    catMap[cat.name] = cat._id as Types.ObjectId;
+    catMap[cat.name] = cat._id;
   }
   console.log(`    Inserted ${categories.length} categories.\n`);
 
@@ -612,7 +602,7 @@ async function seed() {
   const subCategories = await SubCategoryModel.insertMany(subCatsToInsert);
   const subCatMap: Record<string, Types.ObjectId> = {};
   for (const sc of subCategories) {
-    subCatMap[sc.name] = sc._id as Types.ObjectId;
+    subCatMap[sc.name] = sc._id;
   }
   console.log(`    Inserted ${subCategories.length} sub-categories.\n`);
 
@@ -621,7 +611,7 @@ async function seed() {
   const brands = await BrandModel.insertMany(brandsData);
   const brandMap: Record<string, Types.ObjectId> = {};
   for (const brand of brands) {
-    brandMap[brand.name] = brand._id as Types.ObjectId;
+    brandMap[brand.name] = brand._id;
   }
   console.log(`    Inserted ${brands.length} brands.\n`);
 

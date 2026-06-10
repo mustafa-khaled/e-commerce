@@ -46,4 +46,3 @@ export class CouponController {
     return this.couponService.remove(id);
   }
 }
-

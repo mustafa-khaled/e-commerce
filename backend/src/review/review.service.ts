@@ -7,9 +7,8 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Review } from './review.schema';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { findDocumentById } from '@/common/utils/find-by-id.util';
-import { QueryReviewDto } from './dto/query-review.dto';
 import { Product } from '@/product/product.schema';
 
 @Injectable()
@@ -19,54 +18,29 @@ export class ReviewService {
     @InjectModel(Product.name) private productModel: Model<Product>,
   ) {}
 
-  async findAll(query: QueryReviewDto) {
-    const {
-      page = 1,
-      limit = 10,
-      sort = 'createdAt',
-      sortOrder = 'desc',
-    } = query;
+  async findAll(productId: string) {
+    await findDocumentById(this.productModel, productId, 'Product');
 
-    const skip = (page - 1) * limit;
-
-    const filter: mongoose.QueryFilter<Review> = {};
-
-    if (query.product) filter.product = query.product;
-    if (query.user) filter.user = query.user;
-    if (query.rating) filter.rating = query.rating;
-    if (query.isActive !== undefined) filter.isActive = query.isActive;
-
-    const [reviews, total] = await Promise.all([
-      this.reviewModel
-        .find(filter)
-        .skip(skip)
-        .limit(limit)
-        .sort({ [sort]: sortOrder === 'asc' ? 1 : -1 })
-        .populate('user', 'name email')
-        .populate('product', 'name slug')
-        .exec(),
-
-      this.reviewModel.countDocuments(filter),
-    ]);
+    const reviews = await this.reviewModel
+      .find({ product: productId })
+      .populate('user', 'name email')
+      .populate('product', 'title')
+      .sort({ createdAt: -1 });
 
     return {
       message: 'Reviews fetched successfully',
       data: reviews,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
+      total: reviews.length,
     };
   }
 
   async findOne(id: string) {
-    const review = await findDocumentById(this.reviewModel, id, 'Review');
+    await findDocumentById(this.reviewModel, id, 'Review');
 
-    // Populate references consistently with findAll
-    await review.populate('user', 'name email');
-    await review.populate('product', 'name slug');
+    const review = await this.reviewModel
+      .findById(id)
+      .populate('user', 'name email')
+      .populate('product', 'title');
 
     return {
       message: 'Review fetched successfully',

@@ -39,8 +39,8 @@ export class ProductService {
       if (query[field]) {
         const mongoFilter: Record<string, number> = {};
         for (const op of ['gte', 'lte', 'gt', 'lt'] as const) {
-          if (query[field]![op] !== undefined) {
-            mongoFilter[`$${op}`] = query[field]![op]!;
+          if (query[field][op] !== undefined) {
+            mongoFilter[`$${op}`] = query[field][op]!;
           }
         }
         if (Object.keys(mongoFilter).length > 0) {

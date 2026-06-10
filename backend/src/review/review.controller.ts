@@ -6,14 +6,12 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { QueryReviewDto } from './dto/query-review.dto';
 import { AuthUser } from '@/common/interfaces/auth-user.interface';
 import { Roles } from '@/user/decorator/roles.decorator';
 import { UserRole } from '@/user/enums/user-role.enum';
@@ -23,9 +21,9 @@ import { AuthGuard } from '@/user/guard/auth.guard';
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
-  @Get()
-  findAll(@Query() query: QueryReviewDto) {
-    return this.reviewService.findAll(query);
+  @Get('product/:productId')
+  findAll(@Param('productId') productId: string) {
+    return this.reviewService.findAll(productId);
   }
 
   @Get(':id')
