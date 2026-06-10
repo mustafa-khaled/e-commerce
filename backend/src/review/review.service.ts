@@ -19,8 +19,6 @@ export class ReviewService {
   ) {}
 
   async findAll(productId: string) {
-    await findDocumentById(this.productModel, productId, 'Product');
-
     const reviews = await this.reviewModel
       .find({ product: productId })
       .populate('user', 'name email')
@@ -34,17 +32,16 @@ export class ReviewService {
     };
   }
 
-  async findOne(id: string) {
-    await findDocumentById(this.reviewModel, id, 'Review');
-
-    const review = await this.reviewModel
-      .findById(id)
+  async findOne(userId: string) {
+    const reviews = await this.reviewModel
+      .find({ user: userId })
       .populate('user', 'name email')
-      .populate('product', 'title');
+      .populate('product', 'title')
+      .sort({ createdAt: -1 });
 
     return {
       message: 'Review fetched successfully',
-      data: review,
+      data: reviews,
     };
   }
 

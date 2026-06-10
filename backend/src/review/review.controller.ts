@@ -21,14 +21,16 @@ import { AuthGuard } from '@/user/guard/auth.guard';
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
-  @Get('product/:productId')
-  findAll(@Param('productId') productId: string) {
+  @Get('product/:id')
+  findAll(@Param('id') productId: string) {
     return this.reviewService.findAll(productId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reviewService.findOne(id);
+  @Get('user/:id')
+  @UseGuards(AuthGuard)
+  @Roles([UserRole.ADMIN])
+  findOne(@Param('id') userId: string) {
+    return this.reviewService.findOne(userId);
   }
 
   @Post()
