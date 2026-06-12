@@ -45,22 +45,18 @@ export class ReviewController {
 
   @Patch(':id')
   @UseGuards(AuthGuard)
-  @Roles([UserRole.USER, UserRole.ADMIN])
+  @Roles([UserRole.USER])
   update(
     @Param('id') id: string,
     @Body() updateReviewDto: UpdateReviewDto,
     @Req() req: { user: AuthUser },
   ) {
-    if (req.user.role === UserRole.ADMIN) {
-      return this.reviewService.update(id, updateReviewDto);
-    }
-
     return this.reviewService.update(id, updateReviewDto, req.user._id);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  @Roles([UserRole.USER, UserRole.ADMIN])
+  @Roles([UserRole.USER])
   remove(@Param('id') id: string, @Req() req: { user: AuthUser }) {
     if (req.user.role === UserRole.USER) {
       return this.reviewService.remove(id, req.user._id);

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
@@ -9,14 +10,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Review } from './review.schema';
 import { Model } from 'mongoose';
 import { findDocumentById } from '@/common/utils/find-by-id.util';
-import { Product } from '@/product/product.schema';
 
 @Injectable()
 export class ReviewService {
-  constructor(
-    @InjectModel(Review.name) private reviewModel: Model<Review>,
-    @InjectModel(Product.name) private productModel: Model<Product>,
-  ) {}
+  constructor(@InjectModel(Review.name) private reviewModel: Model<Review>) {}
 
   async findAll(productId: string) {
     const reviews = await this.reviewModel
@@ -45,14 +42,8 @@ export class ReviewService {
     };
   }
 
+  // TODO: must effect rating in product module
   async create(createReviewDto: CreateReviewDto, userId: string) {
-    // Validate that the product exists
-    await findDocumentById(
-      this.productModel,
-      createReviewDto.product.toString(),
-      'Product',
-    );
-
     const isExist = await this.reviewModel.findOne({
       product: createReviewDto.product,
       user: userId,
@@ -76,13 +67,21 @@ export class ReviewService {
   async update(id: string, updateReviewDto: UpdateReviewDto, userId?: string) {
     const review = await findDocumentById(this.reviewModel, id, 'Review');
 
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+
     if (userId) {
       this.isUserAuthorized(review, userId);
     }
 
     const updatedReview = await this.reviewModel.findByIdAndUpdate(
       id,
-      updateReviewDto,
+      {
+        ...updateReviewDto,
+        user: userId,
+        product: review.product,
+      },
       {
         new: true,
       },
