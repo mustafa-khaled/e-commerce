@@ -4,8 +4,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from './category.schema';
 import { Model } from 'mongoose';
-import { escapeRegex } from '@/common/utils/escape-regex.util';
-import { findDocumentById } from '@/common/utils/find-by-id.util';
+import { escapeRegex, findDocumentById } from '@/common/utils';
 
 @Injectable()
 export class CategoryService {

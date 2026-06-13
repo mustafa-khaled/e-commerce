@@ -29,8 +29,8 @@ export class ReviewController {
   @Get('user/:id')
   @UseGuards(AuthGuard)
   @Roles([UserRole.ADMIN])
-  findOne(@Param('id') userId: string) {
-    return this.reviewService.findOne(userId);
+  findByUser(@Param('id') userId: string) {
+    return this.reviewService.findByUser(userId);
   }
 
   @Post()
@@ -56,7 +56,7 @@ export class ReviewController {
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  @Roles([UserRole.USER])
+  @Roles([UserRole.ADMIN, UserRole.USER])
   remove(@Param('id') id: string, @Req() req: { user: AuthUser }) {
     if (req.user.role === UserRole.USER) {
       return this.reviewService.remove(id, req.user._id);

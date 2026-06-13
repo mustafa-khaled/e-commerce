@@ -31,9 +31,12 @@ export class Review extends Document {
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);
 
-// Enforce one review per user per product at DB level (also fixes race conditions)
-ReviewSchema.index({ product: 1, user: 1 }, { unique: true });
-// Fast product review listing (sorted by newest)
-ReviewSchema.index({ product: 1, createdAt: -1 });
+// One active review per user per product (allows re-review after soft delete)
+ReviewSchema.index(
+  { product: 1, user: 1 },
+  { unique: true, partialFilterExpression: { isActive: true } },
+);
+// Fast active product review listing (sorted by newest)
+ReviewSchema.index({ product: 1, isActive: 1, createdAt: -1 });
 // Fast user review lookup
 ReviewSchema.index({ user: 1 });

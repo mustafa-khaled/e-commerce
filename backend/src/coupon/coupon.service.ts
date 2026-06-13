@@ -4,8 +4,7 @@ import { UpdateCouponDto } from './dto/update-coupon.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Coupon, CouponDocument } from './coupon.schema';
 import { Model } from 'mongoose';
-import { findDocumentById } from '@/common/utils/find-by-id.util';
-import { escapeRegex } from '@/common/utils/escape-regex.util';
+import { findDocumentById, escapeRegex } from '@/common/utils';
 
 @Injectable()
 export class CouponService {

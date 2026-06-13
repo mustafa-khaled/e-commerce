@@ -4,12 +4,12 @@ import { UpdateSubCategoryDto } from './dto/update-sub-category.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { SubCategory } from './sub-category.schema';
 import { Model } from 'mongoose';
-import { escapeRegex } from '@/common/utils/escape-regex.util';
-import { CategoryService } from '@/category/category.service';
 import {
+  escapeRegex,
   findDocumentById,
   validateObjectId,
-} from '@/common/utils/find-by-id.util';
+} from '@/common/utils';
+import { CategoryService } from '@/category/category.service';
 
 @Injectable()
 export class SubCategoryService {

@@ -4,8 +4,7 @@ import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Supplier, SupplierDocument } from './supplier.schema';
 import { Model } from 'mongoose';
-import { findDocumentById } from '@/common/utils/find-by-id.util';
-import { escapeRegex } from '@/common/utils/escape-regex.util';
+import { findDocumentById, escapeRegex } from '@/common/utils';
 
 @Injectable()
 export class SupplierService {

@@ -4,7 +4,7 @@ import { UpdateTaxDto } from './dto/update-tax.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { TaxRule, TaxClass } from './tax.schema';
 import { Model } from 'mongoose';
-import { findDocumentById } from '@/common/utils/find-by-id.util';
+import { findDocumentById } from '@/common/utils';
 
 @Injectable()
 export class TaxService implements OnModuleInit {

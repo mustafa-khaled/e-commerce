@@ -4,8 +4,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product, ProductDocument } from './product.schema';
 import { Model } from 'mongoose';
-import { findDocumentById } from '@/common/utils/find-by-id.util';
-import { escapeRegex } from '@/common/utils/escape-regex.util';
+import { findDocumentById, escapeRegex } from '@/common/utils';
 import { Category, CategoryDocument } from '@/category/category.schema';
 import {
   SubCategory,

@@ -146,8 +146,6 @@ function buildProducts(
       category: catMap['Electronics'],
       subCategory: subCatMap['Smartphones'],
       brand: brandMap['Apple'],
-      ratingsAverage: 4.8,
-      ratingsQuantity: 312,
     },
     {
       title: 'Samsung Galaxy S25 Ultra',
@@ -165,8 +163,6 @@ function buildProducts(
       category: catMap['Electronics'],
       subCategory: subCatMap['Smartphones'],
       brand: brandMap['Samsung'],
-      ratingsAverage: 4.6,
-      ratingsQuantity: 198,
     },
     {
       title: 'MacBook Pro 16-inch M4 Pro',
@@ -181,8 +177,6 @@ function buildProducts(
       category: catMap['Electronics'],
       subCategory: subCatMap['Laptops'],
       brand: brandMap['Apple'],
-      ratingsAverage: 4.9,
-      ratingsQuantity: 87,
     },
     {
       title: 'Samsung Galaxy Book4 Ultra',
@@ -198,8 +192,6 @@ function buildProducts(
       category: catMap['Electronics'],
       subCategory: subCatMap['Laptops'],
       brand: brandMap['Samsung'],
-      ratingsAverage: 4.3,
-      ratingsQuantity: 41,
     },
     {
       title: 'Sony WH-1000XM5 Wireless Headphones',
@@ -215,8 +207,6 @@ function buildProducts(
       category: catMap['Electronics'],
       subCategory: subCatMap['Audio'],
       brand: brandMap['Sony'],
-      ratingsAverage: 4.7,
-      ratingsQuantity: 540,
     },
     {
       title: 'Apple AirPods Pro 2nd Generation',
@@ -231,8 +221,6 @@ function buildProducts(
       category: catMap['Electronics'],
       subCategory: subCatMap['Audio'],
       brand: brandMap['Apple'],
-      ratingsAverage: 4.6,
-      ratingsQuantity: 892,
     },
 
     // ── Fashion ──────────────────────────────────────────────────
@@ -253,8 +241,6 @@ function buildProducts(
       category: catMap['Fashion'],
       subCategory: subCatMap['Shoes'],
       brand: brandMap['Nike'],
-      ratingsAverage: 4.5,
-      ratingsQuantity: 320,
     },
     {
       title: 'Adidas Ultraboost Light Running Shoes',
@@ -269,8 +255,6 @@ function buildProducts(
       category: catMap['Fashion'],
       subCategory: subCatMap['Shoes'],
       brand: brandMap['Adidas'],
-      ratingsAverage: 4.4,
-      ratingsQuantity: 215,
     },
     {
       title: "Levi's 501 Original Fit Jeans",
@@ -285,8 +269,6 @@ function buildProducts(
       category: catMap['Fashion'],
       subCategory: subCatMap['Men Clothing'],
       brand: brandMap["Levi's"],
-      ratingsAverage: 4.3,
-      ratingsQuantity: 478,
     },
     {
       title: 'Nike Dri-FIT Running T-Shirt',
@@ -302,8 +284,6 @@ function buildProducts(
       category: catMap['Fashion'],
       subCategory: subCatMap['Men Clothing'],
       brand: brandMap['Nike'],
-      ratingsAverage: 4.2,
-      ratingsQuantity: 650,
     },
     {
       title: 'Adidas Essentials Hoodie Women',
@@ -318,8 +298,6 @@ function buildProducts(
       category: catMap['Fashion'],
       subCategory: subCatMap['Women Clothing'],
       brand: brandMap['Adidas'],
-      ratingsAverage: 4.4,
-      ratingsQuantity: 287,
     },
 
     // ── Home & Kitchen ───────────────────────────────────────────
@@ -337,8 +315,6 @@ function buildProducts(
       category: catMap['Home & Kitchen'],
       subCategory: subCatMap['Kitchen Appliances'],
       brand: brandMap['Philips'],
-      ratingsAverage: 4.5,
-      ratingsQuantity: 73,
     },
     {
       title: 'Philips Air Fryer XXL Premium',
@@ -354,8 +330,6 @@ function buildProducts(
       category: catMap['Home & Kitchen'],
       subCategory: subCatMap['Kitchen Appliances'],
       brand: brandMap['Philips'],
-      ratingsAverage: 4.6,
-      ratingsQuantity: 167,
     },
     {
       title: 'IKEA KALLAX Shelf Unit 4x4',
@@ -373,8 +347,6 @@ function buildProducts(
       category: catMap['Home & Kitchen'],
       subCategory: subCatMap['Furniture'],
       brand: brandMap['IKEA'],
-      ratingsAverage: 4.1,
-      ratingsQuantity: 534,
     },
     {
       title: 'IKEA MALM Bed Frame Queen',
@@ -389,8 +361,6 @@ function buildProducts(
       category: catMap['Home & Kitchen'],
       subCategory: subCatMap['Furniture'],
       brand: brandMap['IKEA'],
-      ratingsAverage: 4.0,
-      ratingsQuantity: 310,
     },
     {
       title: 'Samsung Smart Refrigerator Family Hub',
@@ -405,8 +375,6 @@ function buildProducts(
       category: catMap['Home & Kitchen'],
       subCategory: subCatMap['Kitchen Appliances'],
       brand: brandMap['Samsung'],
-      ratingsAverage: 4.4,
-      ratingsQuantity: 28,
     },
 
     // ── Sports & Outdoors ────────────────────────────────────────
@@ -423,8 +391,6 @@ function buildProducts(
       category: catMap['Sports & Outdoors'],
       subCategory: subCatMap['Fitness Equipment'],
       brand: brandMap['Nike'],
-      ratingsAverage: 4.5,
-      ratingsQuantity: 195,
     },
     {
       title: 'Adidas Performance Resistance Bands Set',
@@ -440,8 +406,6 @@ function buildProducts(
       category: catMap['Sports & Outdoors'],
       subCategory: subCatMap['Fitness Equipment'],
       brand: brandMap['Adidas'],
-      ratingsAverage: 4.2,
-      ratingsQuantity: 710,
     },
     {
       title: 'The North Face Borealis Backpack',
@@ -456,8 +420,6 @@ function buildProducts(
       category: catMap['Sports & Outdoors'],
       subCategory: subCatMap['Outdoor Gear'],
       brand: brandMap['The North Face'],
-      ratingsAverage: 4.6,
-      ratingsQuantity: 420,
     },
     {
       title: 'The North Face Thermoball Eco Jacket',
@@ -473,8 +435,6 @@ function buildProducts(
       category: catMap['Sports & Outdoors'],
       subCategory: subCatMap['Outdoor Gear'],
       brand: brandMap['The North Face'],
-      ratingsAverage: 4.5,
-      ratingsQuantity: 132,
     },
 
     // ── Books ────────────────────────────────────────────────────
@@ -490,8 +450,6 @@ function buildProducts(
       colors: [],
       category: catMap['Books'],
       brand: brandMap['Penguin Books'],
-      ratingsAverage: 4.7,
-      ratingsQuantity: 1240,
     },
     {
       title: 'The Pragmatic Programmer',
@@ -505,8 +463,6 @@ function buildProducts(
       colors: [],
       category: catMap['Books'],
       brand: brandMap['Penguin Books'],
-      ratingsAverage: 4.8,
-      ratingsQuantity: 980,
     },
     {
       title: 'Atomic Habits by James Clear',
@@ -521,8 +477,6 @@ function buildProducts(
       colors: [],
       category: catMap['Books'],
       brand: brandMap['Penguin Books'],
-      ratingsAverage: 4.9,
-      ratingsQuantity: 2100,
     },
 
     // ── Health & Beauty ──────────────────────────────────────────
@@ -539,8 +493,6 @@ function buildProducts(
       colors: ['#FFFFFF', '#FFC0CB', '#1C1C1E'],
       category: catMap['Health & Beauty'],
       brand: brandMap['Philips'],
-      ratingsAverage: 4.4,
-      ratingsQuantity: 345,
     },
     {
       title: 'Philips Lumea IPL Hair Removal Device',
@@ -555,8 +507,6 @@ function buildProducts(
       colors: ['#FFFFFF', '#FFD700'],
       category: catMap['Health & Beauty'],
       brand: brandMap['Philips'],
-      ratingsAverage: 4.3,
-      ratingsQuantity: 112,
     },
   ];
 }
@@ -579,6 +529,7 @@ async function seed() {
   // ── 1. Drop existing data ──────────────────────────────────────
   console.log('🗑️   Dropping existing collections …');
   await ProductModel.deleteMany({});
+  await mongoose.connection.collection('reviews').deleteMany({});
   await SubCategoryModel.deleteMany({});
   await CategoryModel.deleteMany({});
   await BrandModel.deleteMany({});

@@ -2,24 +2,28 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Review } from './review.schema';
-import { Model } from 'mongoose';
-import { findDocumentById } from '@/common/utils/find-by-id.util';
+import { Model, Types } from 'mongoose';
+import { findDocumentById, validateObjectId } from '@/common/utils';
+import { Product } from '@/product/product.schema';
 
 @Injectable()
 export class ReviewService {
-  constructor(@InjectModel(Review.name) private reviewModel: Model<Review>) {}
+  constructor(
+    @InjectModel(Review.name) private reviewModel: Model<Review>,
+    @InjectModel(Product.name) private productModel: Model<Product>,
+  ) {}
 
   async findAll(productId: string) {
+    validateObjectId(productId, 'Product');
+
     const reviews = await this.reviewModel
-      .find({ product: productId })
+      .find({ product: productId, isActive: true })
       .populate('user', 'name email')
-      .populate('product', 'title')
       .sort({ createdAt: -1 });
 
     return {
@@ -29,63 +33,76 @@ export class ReviewService {
     };
   }
 
-  async findOne(userId: string) {
+  async findByUser(userId: string) {
+    validateObjectId(userId, 'User');
+
     const reviews = await this.reviewModel
-      .find({ user: userId })
+      .find({ user: userId, isActive: true })
       .populate('user', 'name email')
       .populate('product', 'title')
       .sort({ createdAt: -1 });
 
     return {
-      message: 'Review fetched successfully',
+      message: 'Reviews fetched successfully',
       data: reviews,
     };
   }
 
-  // TODO: must effect rating in product module
   async create(createReviewDto: CreateReviewDto, userId: string) {
-    const isExist = await this.reviewModel.findOne({
+    await findDocumentById(
+      this.productModel,
+      createReviewDto.product.toString(),
+      'Product',
+    );
+
+    const existing = await this.reviewModel.findOne({
       product: createReviewDto.product,
       user: userId,
+      isActive: true,
     });
 
-    if (isExist) {
+    if (existing) {
       throw new BadRequestException('You have already reviewed this product');
     }
 
-    const review = await this.reviewModel.create({
-      ...createReviewDto,
-      user: userId,
-    });
+    try {
+      const review = await this.reviewModel.create({
+        ...createReviewDto,
+        user: userId,
+      });
 
-    return {
-      message: 'Review created successfully',
-      data: review,
-    };
+      await this.updateProductRating(createReviewDto.product);
+
+      return {
+        message: 'Review created successfully',
+        data: review,
+      };
+    } catch (error) {
+      if (this.isDuplicateKeyError(error)) {
+        throw new BadRequestException('You have already reviewed this product');
+      }
+      throw error;
+    }
   }
 
   async update(id: string, updateReviewDto: UpdateReviewDto, userId?: string) {
     const review = await findDocumentById(this.reviewModel, id, 'Review');
 
-    if (!review) {
-      throw new NotFoundException('Review not found');
-    }
-
     if (userId) {
       this.isUserAuthorized(review, userId);
     }
 
+    if (!review.isActive) {
+      throw new BadRequestException('Review is no longer active');
+    }
+
     const updatedReview = await this.reviewModel.findByIdAndUpdate(
       id,
-      {
-        ...updateReviewDto,
-        user: userId,
-        product: review.product,
-      },
-      {
-        new: true,
-      },
+      updateReviewDto,
+      { new: true, runValidators: true },
     );
+
+    await this.updateProductRating(review.product);
 
     return {
       message: 'Review updated successfully',
@@ -100,7 +117,12 @@ export class ReviewService {
       this.isUserAuthorized(review, userId);
     }
 
+    if (!review.isActive) {
+      throw new BadRequestException('Review is already deleted');
+    }
+
     await review.deleteOne();
+    await this.updateProductRating(review.product);
 
     return {
       message: 'Review deleted successfully',
@@ -113,5 +135,38 @@ export class ReviewService {
         'You are not authorized to perform this action',
       );
     }
+  }
+
+  private isDuplicateKeyError(error: unknown): boolean {
+    return (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code: number }).code === 11000
+    );
+  }
+
+  private async updateProductRating(productId: Types.ObjectId) {
+    const [result] = await this.reviewModel.aggregate<{
+      ratingsQuantity: number;
+      ratingsAverage: number;
+    }>([
+      { $match: { product: productId, isActive: true } },
+      {
+        $group: {
+          _id: null,
+          ratingsQuantity: { $sum: 1 },
+          ratingsAverage: { $avg: '$rating' },
+        },
+      },
+    ]);
+
+    const ratingsQuantity = result?.ratingsQuantity ?? 0;
+    const ratingsAverage = result?.ratingsAverage ?? 0;
+
+    await this.productModel.findByIdAndUpdate(productId, {
+      ratingsAverage,
+      ratingsQuantity,
+    });
   }
 }

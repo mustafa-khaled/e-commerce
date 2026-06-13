@@ -4,11 +4,7 @@ import { UpdateBrandDto } from './dto/update-brand.dto';
 import { Brand } from './brand.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import {
-  findDocumentById,
-  validateObjectId,
-} from '@/common/utils/find-by-id.util';
-import { escapeRegex } from '@/common/utils/escape-regex.util';
+import { findDocumentById, escapeRegex } from '@/common/utils';
 
 @Injectable()
 export class BrandService {

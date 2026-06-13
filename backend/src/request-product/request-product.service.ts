@@ -11,7 +11,7 @@ import {
   RequestProductDocument,
 } from './request-product.schema';
 import { Model } from 'mongoose';
-import { findDocumentById } from '@/common/utils/find-by-id.util';
+import { findDocumentById } from '@/common/utils';
 import { AuthUser } from '@/common/interfaces/auth-user.interface';
 import { UserRole } from '@/user/enums/user-role.enum';
 
