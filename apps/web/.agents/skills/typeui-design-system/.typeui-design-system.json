@@ -1,0 +1,13 @@
+{
+  "designSystemId": "c5ec329c-ac2b-4ce7-a608-bf2726070cad",
+  "installScope": "project",
+  "skillFolderName": "typeui-design-system",
+  "slug": "nostalgia-design-system",
+  "source": "workspace",
+  "templateSlug": "nostalgia",
+  "type": "typeui-design-system",
+  "variant": "workspace",
+  "versionId": "1a31d05d-dc2b-4012-91cf-6a497d17abd1",
+  "versionNumber": 1,
+  "workspaceId": "d45ab1d7-34ff-4285-8c02-ba6cd34e4261"
+}

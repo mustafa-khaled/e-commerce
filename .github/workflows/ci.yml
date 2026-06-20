@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared types
+        run: pnpm --filter @ee/shared-types build
+
+      - name: Lint API
+        run: pnpm --filter @ee/api lint
+
+      - name: Lint Web
+        run: pnpm --filter @ee/web lint
+
+      - name: Build API
+        run: pnpm --filter @ee/api build
+        env:
+          MONGODB_URL: mongodb://localhost:27017/ee-commerce-test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: ci-test-secret
+
+      - name: Test API
+        run: pnpm --filter @ee/api test
+        env:
+          JWT_SECRET: ci-test-secret
+
+      - name: E2E API
+        run: pnpm --filter @ee/api test:e2e
+        env:
+          MONGODB_URL: mongodb://localhost:27017/ee-commerce-test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: ci-test-secret
+
+      - name: Build Web
+        run: pnpm --filter @ee/web build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8080/api/v1

@@ -1,0 +1,15 @@
+{
+  "name": "@ee/api-contract",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "codegen": "openapi-typescript openapi.json -o src/schema.ts",
+    "build": "echo 'api-contract uses generated schema'"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.6.1",
+    "typescript": "^5.7.3"
+  }
+}
