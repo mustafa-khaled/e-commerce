@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Languages, Directions } from "@/constants/enums";
 import { Roboto } from "next/font/google";
 import { Locale } from "@/i18n.config";
-import Header from "@/components/header";
 import CartProvider from "@/components/cart/CartProvider";
 import ReduxProvider from "@/providers/ReduxProvider";
 import QueryProvider from "@/providers/QueryProvider";
@@ -43,7 +42,6 @@ export default async function RootLayout({
         <QueryProvider>
           <ReduxProvider>
             <CartProvider />
-            <Header />
             {children}
           </ReduxProvider>
         </QueryProvider>

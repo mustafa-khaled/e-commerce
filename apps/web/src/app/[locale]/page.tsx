@@ -1,10 +1,22 @@
 import type { Metadata } from "next";
 import { Locale } from "@/i18n.config";
 import getTrans from "@/lib/translation";
-import BestSellers from "@/app/[locale]/_components/home/BestSellers";
-import Hero from "@/app/[locale]/_components/home/Hero";
+import { StoreNavbar } from "@/components/sections/StoreNavbar";
+import { PromoBanner } from "@/components/sections/PromoBanner";
+import { StorefrontHero } from "@/components/sections/StorefrontHero";
+import { ProductCategories } from "@/components/sections/ProductCategories";
+import { ProductCards } from "@/components/sections/ProductCards";
+import { FeatureGrid } from "@/components/sections/FeatureGrid";
+import { SocialProof } from "@/components/sections/SocialProof";
+import { FaqSection } from "@/components/sections/FaqSection";
+import { NewsletterSection } from "@/components/sections/NewsletterSection";
+import { StoreFooter } from "@/components/sections/StoreFooter";
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTrans(locale);
   return {
@@ -15,9 +27,19 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 
 export default async function Home() {
   return (
-    <main>
-      <Hero />
-      <BestSellers />
+    <main className="min-h-screen bg-bg-desktop">
+      <StoreNavbar />
+      <main>
+        <PromoBanner />
+        <StorefrontHero />
+        <ProductCategories />
+        <ProductCards />
+        <FeatureGrid />
+        <SocialProof />
+        <FaqSection />
+        <NewsletterSection />
+      </main>
+      <StoreFooter />
     </main>
   );
 }
